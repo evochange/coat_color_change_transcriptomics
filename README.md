@@ -26,7 +26,7 @@ transrate --threads 8 --assembly ~/timidus/raw_transcriptome_APT/APT_transcripto
 ```
 
 #### Transcriptome annotation
-We annotated our filtered assembly to Rabbit (OryCun2.0) and Mouse (GRCm38) obtained from ENSEMBLE 92 protein references, using the built-in Transrate reciprocal blast algorythm.
+We annotated our filtered assembly to rabbit (OryCun2.0) and mouse (GRCm38) obtained from ENSEMBLE 92 protein references, using the built-in Transrate reciprocal blast algorythm.
 
 ```
 transrate --assembly ~/timidus/transrate_good_APT/good.APT_transcriptome_trinity.Trinity.fasta --reference ~/timidus/references/Oryctolagus_cuniculus.OryCun2.0.pep.all.fa --threads 4 --output ~/timidus/transrate_good_APT/transrate_blast_ORY
@@ -36,30 +36,30 @@ transrate --assembly ~/timidus/transrate_good_APT/good.APT_transcriptome_trinity
 ```
 
 #### Filtering the transcriptome by annotation
-From the "good" transcriptome generated with Transrate, we also removed Trinity genes that annotate to multiple ENSEMBL genes. This happens because Trinity will assemble contigs that should correspond to isoforms. In some cases, these contigs will annotate to ENSEMBL proteins that originate from correspond to different genes and, in that case, we removed them from the analysis. The following are steps we took to find Trinity genes with multiple annotations.
+From the "good" transcriptome generated with Transrate, we also removed Trinity genes that annotate to multiple ENSEMBL genes. This happens because Trinity will assemble contigs that should correspond to isoforms. In some cases, these contigs will annotate to ENSEMBL proteins that correspond to different genes and, if so, we removed them from the analysis. The following are the steps we took to find Trinity genes with multiple annotations.
 
-In the same foulder with the blast results run ```do_annot_table.py```
+In the same folder with the blast results run ```do_annot_table.py```
 
 ```
 do_annot_table.py good.APT_transcriptome_trinity.Trinity_into_Oryctolagus_cuniculus.OryCun2.0.pep.all.1.blast good.APT_transcriptome_trinity.Trinity_into_Mus_musculus.GRCm38.pep.all.1.blast annotation_ORY_MUS.txt annotation_ORY-or-MUS.txt
 ```
 
-Retrieve a table with ENSEMBL gene and transcript annotations for each ENSEMBL protein from the original fasta references
+Retrieve a table with ENSEMBL gene and transcript annotations for each ENSEMBL protein from the original fasta references.
 
 ```
 grep '^>' Mus_musculus.GRCm38.pep.all.fa | cut -f1,4,5,8 -d' ' > Mus_musculus.GRCm38.pep.protein_information.txt
 grep '^>' Oryctolagus_cuniculus.OryCun2.0.pep.all.fa | cut -f1,4,5,8 -d' ' > Oryctolagus_cuniculus.OryCun2.0.pep.protein_information.txt
 ```
-Then run the scripts in the same foulder where the last three steps were run. ```/give_multiannotated_genes_step1.py``` will create an intermediate file with the ENSEMBL gene rabbit and mus annotation of each Trinity gene. This file will include multiple annotated Trinity genes.  ```/give_multiannotated_genes_step2.py``` will separate this file into single and multiple annotated genes.
+Then run the scripts in the same folder where the last three steps were run. ```/give_multiannotated_genes_step1.py``` will create an intermediate file with the ENSEMBL gene rabbit and mouse annotation of each Trinity gene. This file will include multiple annotated Trinity genes.  ```/give_multiannotated_genes_step2.py``` will separate this file into single and multiple annotated genes.
 ```
 ./give_multiannotated_genes_step1.py
 ./give_multiannotated_genes_step2.py
 ```
-The output of ```give_multiannotated_genes_step2.py``` are three files:
+The output of ```give_multiannotated_genes_step2.py``` will be:
 
-- single annotated genes (needed to filter RSEM's output): single_annotated_genes.txt
-- multipleannotated genes, either to Ory or Mus: multi_annotated_genes.txt
-- the genes where one isoform is not annotated: NA_annotated_genes.txt 
+- single_annotated_genes.txt: single annotated genes (needed to filter RSEM's output).
+- multi_annotated_genes.txt: multipleannotated genes, either to Ory or Mus.
+- NA_annotated_genes.txt: the genes where one isoform is not annotated.
 
 ## Mapping and relative abundance estimation
 
@@ -93,4 +93,52 @@ The script ```filter_RSEM_results.py``` will accept any list of Trinity codes. H
 ```
 for i in $(ls *.genes.results); do filter_RSEM_results.py $i sag_to_remove; done
 ```
+
+## Gene Ontology analysis with a costume annotation in Ontologizer
+To take advantage of our mixed annotation where we have rabbit and mouse ENSEMBL codes we used [Ontologizer](http://ontologizer.de/) because it allows using a costume Gene Association Files (GAF) file. There are perhaps better ways to perform this analysis now, and we would advise interested users to check the [Ontologizer website](http://ontologizer.de/), or [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) that now supports non-model organisms as well. We used the following pipeline to generate a costume GAF file.
+
+#### Prepare the necessary inputs
+From ENSEMBL [Biomart](https://www.ensembl.org/biomart/martview/ab1eb25c5409ef27a44f88d46e7448f9), retrieve the corresponding GO term accession for each ENSEMBL gene in the rabbit and mouse genome. The output should look like this:
+```
+Gene stable ID  GO term accession
+ENSOCUG00000012231      
+ENSOCUG00000021536      GO:0042981
+ENSOCUG00000021536      GO:0005102
+ENSOCUG00000021536      GO:0031625
+ENSOCUG00000021536      GO:0042803
+ENSOCUG00000021536      GO:0001836
+ENSOCUG00000021536      GO:0006915
+...
+```
+
+Store them in two separate files, like ```ENSEMBL92_Mmusculus_GRCm38_GO_annotation.txt``` and ```ENSEMBL92_OryCun2_GO_annotation.txt```
+
+Also, store a list with the ENSEMBL rabbit and mouse annotations in the transcriptome in two separate files (in our case ```ltimidus_APT_annot_ory.txt``` and ```ltimidus_APT_annot_mus.txt```). The file should look like this:
+
+```
+ENSOCUG00000004892
+ENSOCUG00000015449
+ENSOCUG00000026197
+ENSOCUG00000024333
+...
+```
+
+Finally, retrieve Gene Ontology Files (obo) from the Gene Ontology [website](http://geneontology.org/). In our case we named it ```go-basic_6Set2018.obo```
+
+#### Generate the GAF file
+Use the scripts ```make_input_4_gaf.py```, ```parse_obo_file.py```and ```do_Gaf_file_new_version.py```. ```make_input_4_gaf.py``` and ```do_Gaf_file_new_version.py``` were published previously for a similar work on snowshoe hares that you can find [here](https://github.com/MafaldaSFerreira/Snowshoe-hare-transcriptome).
+
+Use them like so:
+```
+python make_input_4_Gaf.py ENSEMBL92_OryCun2_GO_annotation.txt ENSEMBL92_Mmusculus_GRCm38_GO_annotation.txt ltimidus_APT_annot_ory.txt ltimidus_APT_annot_mus.txt ltimidus_GO_annot_ENSEMBL92.txt
+```
+```
+parse_obo_file.py go-basic_6Set2018.obo go-basic_6Set2018.tab
+```
+```
+do_GAF_file_new_version.py ltimidus_GO_annot_ENSEMBL92.txt go-basic_6Set2018.tab > ltimidus_transcriptome_6Sep18.gaf
+```
+
+```ltimidus_transcriptome_6Sep18.gaf``` can now be used as input in Ontologizer, along with ```go-basic_6Set2018.obo``` and your gene sets made of, for example, the ENSEMBL annotations of your differentially expressed genes. 
+
 
