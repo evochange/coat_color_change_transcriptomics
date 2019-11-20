@@ -1,7 +1,5 @@
 # Coat color change transcriptomics
-Pipeline and scripts necessary for the analysis of RNA-Sequencing data from skin samples of mountain hare (Lepus timidus) individuals undergoing autumn molt. 
-
-Pipeline and scripts by Mafalda Sousa Ferreira (mafalda_sferreira (at) hotmail.com).
+Pipeline and scripts necessary for the analysis of RNA-Sequencing data from skin samples of mountain hare (Lepus timidus) individuals undergoing autumn molt, by Mafalda Sousa Ferreira (mafalda_sferreira (at) hotmail.com).
 
 All python scripts use python 2.7.
 
