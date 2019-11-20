@@ -5,8 +5,8 @@ Raw reads were cleaned and filtered with Trimmomatic using the following command
 
 All python scripts use python 2.7
 
-- [De novo transcriptome assembly](https://github.com/evochange/coat_color_change_transcriptomics/##De_novo_transcriptome_assembly)
-- [Mapping and relative abundance estimation](https://github.com/evochange/coat_color_change_transcriptomics/##Mapping_and_relative_abundance_estimation)
+- [De novo transcriptome assembly](https://github.com/evochange/coat_color_change_transcriptomics/#de-novo-transcriptome-assembly)
+- [Mapping and relative abundance estimation](https://github.com/evochange/coat_color_change_transcriptomics/#mapping-and-relative-abundance-estimation)
 
 ## De novo transcriptome assembly
 Reads 1 and reads 2 for all individuals were concatenated in two files ```timidus_R1.fastq.gz```and ```timidus_R2.fastq.gz```
