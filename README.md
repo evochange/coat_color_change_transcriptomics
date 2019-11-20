@@ -1,7 +1,7 @@
 # Coat color change transcriptomics
-Pipeline and scripts necessary for the analysis of RNA-Sequencing data from skin samples of mountain hare (Lepus timidus) individuals undergoing autumn molt. For any questions, please contact Mafalda Sousa Ferreira @ mafalda_sferreira (at) hotmail.com
+Pipeline and scripts necessary for the analysis of RNA-Sequencing data from skin samples of mountain hare (Lepus timidus) individuals undergoing autumn molt. For any questions, please contact Mafalda Sousa Ferreira @ mafalda_sferreira (at) hotmail.com.
 
-All python scripts use python 2.7
+All python scripts use python 2.7.
 
 This pipeline assumes that raw reads were already cleaned and filtered with tools such as Cutadapt and Trimmomatic.
 
@@ -10,17 +10,17 @@ This pipeline assumes that raw reads were already cleaned and filtered with tool
 - [Gene Ontology analysis with a costume annotation in Ontologizer](https://github.com/evochange/coat_color_change_transcriptomics/blob/master/README.md#gene-ontology-analysis-with-a-costume-annotation-in-ontologizer)
 
 ## De novo transcriptome assembly
-Reads 1 and reads 2 for all individuals were concatenated in two files ```timidus_R1.fq.gz```and ```timidus_R2.fq.gz```
+Reads 1 and reads 2 for all individuals were concatenated in two files ```timidus_R1.fq.gz```and ```timidus_R2.fq.gz```.
 
 #### Generating a raw assembly
-We run Trinity 2.6.6 to generate the assembly
+We run Trinity 2.6.6 to generate the assembly.
 
 ```
 /bin/trinityrnaseq-Trinity-v2.6.6/Trinity -seqType fq --max_memory 100G --CPU 8 --left timidus_R1.fq.gz --right timidus_R2.fq.gz --full_cleanup --SS_lib_type RF --output APT_transcriptome_trinity
 ```
 
 #### Assessing assembly quality
-We used Transrate 1.0.3 to assess raw assembly quality and generate a filtered assembly
+We used Transrate 1.0.3 to assess raw assembly quality and generate a "good" (filtered) assembly.
 
 ```
 transrate --threads 8 --assembly ~/timidus/raw_transcriptome_APT/APT_transcriptome_trinity.Trinity.fasta --left ~/timidus/filtered_reads/timidus_R1.fq --right ~/timidus/filtered_reads/timidus_R2.fq --output ~/timidus/transrate_good_APT/
@@ -39,7 +39,7 @@ transrate --assembly ~/timidus/transrate_good_APT/good.APT_transcriptome_trinity
 #### Filtering the transcriptome by annotation
 From the "good" transcriptome generated with Transrate, we also removed Trinity genes that annotate to multiple ENSEMBL genes. This happens because Trinity will assemble contigs that should correspond to isoforms. In some cases, these contigs will annotate to ENSEMBL proteins that correspond to different genes and, if so, we removed them from the analysis. The following are the steps we took to find Trinity genes with multiple annotations.
 
-In the same folder with the blast results run ```do_annot_table.py```
+In the same folder with the blast results run ```do_annot_table.py```.
 
 ```
 do_annot_table.py good.APT_transcriptome_trinity.Trinity_into_Oryctolagus_cuniculus.OryCun2.0.pep.all.1.blast good.APT_transcriptome_trinity.Trinity_into_Mus_musculus.GRCm38.pep.all.1.blast annotation_ORY_MUS.txt annotation_ORY-or-MUS.txt
@@ -64,7 +64,7 @@ The output of ```give_multiannotated_genes_step2.py``` will be:
 
 ## Mapping and relative abundance estimation
 
-Create bowtie2 indices first, using the RSEM wrapper:
+Create bowtie2 indices first, using the RSEM wrapper.
 
 ```
 ~/my_programs/RSEM-1.3.0/extract-transcript-to-gene-map-from-trinity good.APT_transcriptome_trinity.Trinity.fasta APT_transcript-to-gene-map
@@ -73,13 +73,13 @@ Create bowtie2 indices first, using the RSEM wrapper:
 ~/my_programs/RSEM-1.3.0/rsem-prepare-reference --bowtie2 --bowtie2-path ~/my_programs/bowtie2-2.3.4.1-linux-x86_64/ --transcript-to-gene-map APT_transcript-to-gene-map good.APT_transcriptome_trinity.Trinity.fasta APT
 ```
 
-Map reads using bowtie2:
+Map reads using bowtie2.
 
 ```
 for f in $(ls *1.fastq.gz); do ~/my_programs/bowtie2-2.3.4.1-linux-x86_64/bowtie2 -q --phred33 -D 20 -R 3 -N 1 -L 20 -i S,1,0.50 --dpad 0 --gbar 9999999 --mp 1,1 --np 1 --score-min L,0,-0.1 -I 1 -X 1000 --no-mixed --no-discordant --nofw -p 1 -k 200 --fr -x ../transrate_good_APT/APT -1 $f -2 ${f/1.fastq.gz/2.fastq.gz} -S ${f/R1.fastq.gz/APT.sam}; done
 ```
 
-Use RSEM to calculate expression:
+Use RSEM to calculate expression.
 ```
 for f in $(ls *.sam); do ~/my_programs/RSEM-1.3.0/rsem-calculate-expression --calc-ci --seed-length 23 --paired-end --sam $f ~/timidus/transrate_good_APT/APT_transcriptome_trinity.Trinity/APT ~/timidus/rsem_APT/${f/.sam/_rsem_results}; done
 ```
@@ -112,7 +112,7 @@ ENSOCUG00000021536      GO:0006915
 ...
 ```
 
-Store them in two separate files, like ```ENSEMBL92_Mmusculus_GRCm38_GO_annotation.txt``` and ```ENSEMBL92_OryCun2_GO_annotation.txt```
+Store them in two separate files, like ```ENSEMBL92_Mmusculus_GRCm38_GO_annotation.txt``` and ```ENSEMBL92_OryCun2_GO_annotation.txt```.
 
 Also, store a list with the ENSEMBL rabbit and mouse annotations in the transcriptome in two separate files (in our case ```ltimidus_APT_annot_ory.txt``` and ```ltimidus_APT_annot_mus.txt```). The file should look like this:
 
@@ -124,7 +124,7 @@ ENSOCUG00000024333
 ...
 ```
 
-Finally, retrieve Gene Ontology Files (obo) from the Gene Ontology [website](http://geneontology.org/). In our case we named it ```go-basic_6Set2018.obo```
+Finally, retrieve Gene Ontology Files (obo) from the Gene Ontology [website](http://geneontology.org/). In our case we named it ```go-basic_6Set2018.obo```.
 
 #### Generate the GAF file
 Use the scripts ```make_input_4_gaf.py```, ```parse_obo_file.py```and ```do_Gaf_file_new_version.py```. ```make_input_4_gaf.py``` and ```do_Gaf_file_new_version.py``` were published previously for a similar work on snowshoe hares that you can find [here](https://github.com/MafaldaSFerreira/Snowshoe-hare-transcriptome).
