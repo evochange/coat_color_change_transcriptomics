@@ -59,7 +59,7 @@ give_multiannotated_genes_step2.py
 The output of ```give_multiannotated_genes_step2.py``` will be:
 
 - single_annotated_genes.txt: single annotated genes (needed to filter RSEM's output).
-- multi_annotated_genes.txt: multipleannotated genes, either to Ory or Mus.
+- multi_annotated_genes.txt: multipleannotated genes, either to rabbit or mouse.
 - NA_annotated_genes.txt: the genes where one isoform is not annotated.
 
 ## Mapping and relative abundance estimation
