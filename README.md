@@ -1,12 +1,13 @@
 # Coat color change transcriptomics
-Pipeline and scripts necessary for the analysis of RNA-Sequencing data from the mountain hare (Lepus timidus) fall moult
-
-This pipeline assumes that raw reads were already cleaned and filtered with tools such as Cutadapt and Trimmomatic.
+Pipeline and scripts necessary for the analysis of RNA-Sequencing data from skin samples of mountain hare (Lepus timidus) individuals undergoing autumn molt. For any questions, please contact Mafalda Sousa Ferreira @ mafalda_sferreira (at) hotmail.com
 
 All python scripts use python 2.7
 
+This pipeline assumes that raw reads were already cleaned and filtered with tools such as Cutadapt and Trimmomatic.
+
 - [De novo transcriptome assembly](https://github.com/evochange/coat_color_change_transcriptomics/#de-novo-transcriptome-assembly)
 - [Mapping and relative abundance estimation](https://github.com/evochange/coat_color_change_transcriptomics/#mapping-and-relative-abundance-estimation)
+- [Gene Ontology analysis with a costume annotation in Ontologizer](https://github.com/evochange/coat_color_change_transcriptomics/blob/master/README.md#gene-ontology-analysis-with-a-costume-annotation-in-ontologizer)
 
 ## De novo transcriptome assembly
 Reads 1 and reads 2 for all individuals were concatenated in two files ```timidus_R1.fq.gz```and ```timidus_R2.fq.gz```
