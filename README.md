@@ -1,5 +1,7 @@
 # Coat color change transcriptomics
-Pipeline and scripts necessary for the analysis of RNA-Sequencing data from skin samples of mountain hare (Lepus timidus) individuals undergoing autumn molt. For any questions, please contact Mafalda Sousa Ferreira @ mafalda_sferreira (at) hotmail.com.
+Pipeline and scripts necessary for the analysis of RNA-Sequencing data from skin samples of mountain hare (Lepus timidus) individuals undergoing autumn molt. 
+
+Pipeline and scripts by Mafalda Sousa Ferreira (mafalda_sferreira (at) hotmail.com).
 
 All python scripts use python 2.7.
 
@@ -51,10 +53,10 @@ Retrieve a table with ENSEMBL gene and transcript annotations for each ENSEMBL p
 grep '^>' Mus_musculus.GRCm38.pep.all.fa | cut -f1,4,5,8 -d' ' > Mus_musculus.GRCm38.pep.protein_information.txt
 grep '^>' Oryctolagus_cuniculus.OryCun2.0.pep.all.fa | cut -f1,4,5,8 -d' ' > Oryctolagus_cuniculus.OryCun2.0.pep.protein_information.txt
 ```
-Then run the scripts in the same folder where the last three steps were run. ```/give_multiannotated_genes_step1.py``` will create an intermediate file with the ENSEMBL gene rabbit and mouse annotation of each Trinity gene. This file will include multiple annotated Trinity genes.  ```/give_multiannotated_genes_step2.py``` will separate this file into single and multiple annotated genes.
+Then run the scripts in the same folder where the last three steps were run. ```give_multiannotated_genes_step1.py``` will create an intermediate file with the ENSEMBL gene rabbit and mouse annotation of each Trinity gene. This file will include multiple annotated Trinity genes.  ```give_multiannotated_genes_step2.py``` will separate this file into single and multiple annotated genes.
 ```
-./give_multiannotated_genes_step1.py
-./give_multiannotated_genes_step2.py
+give_multiannotated_genes_step1.py
+give_multiannotated_genes_step2.py
 ```
 The output of ```give_multiannotated_genes_step2.py``` will be:
 
@@ -137,7 +139,7 @@ python make_input_4_Gaf.py ENSEMBL92_OryCun2_GO_annotation.txt ENSEMBL92_Mmuscul
 parse_obo_file.py go-basic_6Set2018.obo go-basic_6Set2018.tab
 ```
 ```
-do_GAF_file_new_version.py ltimidus_GO_annot_ENSEMBL92.txt go-basic_6Set2018.tab > ltimidus_transcriptome_6Sep18.gaf
+python do_GAF_file_new_version.py ltimidus_GO_annot_ENSEMBL92.txt go-basic_6Set2018.tab > ltimidus_transcriptome_6Sep18.gaf
 ```
 
 ```ltimidus_transcriptome_6Sep18.gaf``` can now be used as input in Ontologizer, along with ```go-basic_6Set2018.obo``` and your gene sets made of, for example, the ENSEMBL annotations of your differentially expressed genes. 
