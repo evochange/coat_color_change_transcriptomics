@@ -1,7 +1,7 @@
 # Coat color change transcriptomics
 Pipeline and scripts necessary for the analysis of RNA-Sequencing data from the mountain hare (Lepus timidus) fall moult
 
-Raw reads were cleaned and filtered with Trimmomatic using the following command: 
+This pipeline assumes that raw reads were already cleaned and filtered with tools such as Cutadapt and Trimmomatic.
 
 All python scripts use python 2.7
 
@@ -9,13 +9,13 @@ All python scripts use python 2.7
 - [Mapping and relative abundance estimation](https://github.com/evochange/coat_color_change_transcriptomics/#mapping-and-relative-abundance-estimation)
 
 ## De novo transcriptome assembly
-Reads 1 and reads 2 for all individuals were concatenated in two files ```timidus_R1.fastq.gz```and ```timidus_R2.fastq.gz```
+Reads 1 and reads 2 for all individuals were concatenated in two files ```timidus_R1.fq.gz```and ```timidus_R2.fq.gz```
 
 #### Generating a raw assembly
 We run Trinity 2.6.6 to generate the assembly
 
 ```
-/bin/trinityrnaseq-Trinity-v2.6.6/Trinity -seqType fq --max_memory 100G --CPU 8 --left timidus_R1.fastq.gz --right timidus_R2.fastq.gz --full_cleanup --SS_lib_type RF --output APT_transcriptome_trinity
+/bin/trinityrnaseq-Trinity-v2.6.6/Trinity -seqType fq --max_memory 100G --CPU 8 --left timidus_R1.fq.gz --right timidus_R2.fq.gz --full_cleanup --SS_lib_type RF --output APT_transcriptome_trinity
 ```
 
 #### Assessing assembly quality
@@ -26,7 +26,7 @@ transrate --threads 8 --assembly ~/timidus/raw_transcriptome_APT/APT_transcripto
 ```
 
 #### Transcriptome annotation
-We annotated our filtered assembly to Rabbit (OryCun2.0) and Mouse (GRCm38) using the built-in Transrate reciprocal blast algorythm.
+We annotated our filtered assembly to Rabbit (OryCun2.0) and Mouse (GRCm38) obtained from ENSEMBLE 92 protein references, using the built-in Transrate reciprocal blast algorythm.
 
 ```
 transrate --assembly ~/timidus/transrate_good_APT/good.APT_transcriptome_trinity.Trinity.fasta --reference ~/timidus/references/Oryctolagus_cuniculus.OryCun2.0.pep.all.fa --threads 4 --output ~/timidus/transrate_good_APT/transrate_blast_ORY
@@ -36,7 +36,9 @@ transrate --assembly ~/timidus/transrate_good_APT/good.APT_transcriptome_trinity
 ```
 
 #### Filtering the transcriptome by annotation
-Inside the same foulder, copy blasts results and run ```do_annot_table.py```
+From the "good" transcriptome generated with Transrate, we also removed Trinity genes that annotate to multiple ENSEMBL genes. This happens because Trinity will assemble contigs that should correspond to isoforms. In some cases, these contigs will annotate to ENSEMBL proteins that originate from correspond to different genes and, in that case, we removed them from the analysis. The following are steps we took to find Trinity genes with multiple annotations.
+
+In the same foulder with the blast results run ```do_annot_table.py```
 
 ```
 do_annot_table.py good.APT_transcriptome_trinity.Trinity_into_Oryctolagus_cuniculus.OryCun2.0.pep.all.1.blast good.APT_transcriptome_trinity.Trinity_into_Mus_musculus.GRCm38.pep.all.1.blast annotation_ORY_MUS.txt annotation_ORY-or-MUS.txt
@@ -48,14 +50,14 @@ Retrieve a table with ENSEMBL gene and transcript annotations for each ENSEMBL p
 grep '^>' Mus_musculus.GRCm38.pep.all.fa | cut -f1,4,5,8 -d' ' > Mus_musculus.GRCm38.pep.protein_information.txt
 grep '^>' Oryctolagus_cuniculus.OryCun2.0.pep.all.fa | cut -f1,4,5,8 -d' ' > Oryctolagus_cuniculus.OryCun2.0.pep.protein_information.txt
 ```
-Then run the scripts, that will read the files generated in the three last steps.
+Then run the scripts in the same foulder where the last three steps were run. ```/give_multiannotated_genes_step1.py``` will create an intermediate file with the ENSEMBL gene rabbit and mus annotation of each Trinity gene. This file will include multiple annotated Trinity genes.  ```/give_multiannotated_genes_step2.py``` will separate this file into single and multiple annotated genes.
 ```
-./give_multiannotated_gene_step1.py
+./give_multiannotated_genes_step1.py
 ./give_multiannotated_genes_step2.py
 ```
-The output of the ```give_multiannotated_genes_step2.py``` are three files:
+The output of ```give_multiannotated_genes_step2.py``` are three files:
 
-- single annotated genes (need to filter RSEM's output): single_annotated_genes.txt
+- single annotated genes (needed to filter RSEM's output): single_annotated_genes.txt
 - multipleannotated genes, either to Ory or Mus: multi_annotated_genes.txt
 - the genes where one isoform is not annotated: NA_annotated_genes.txt 
 
@@ -86,8 +88,9 @@ Finally, filter multiple annotated genes from RSEM's output with ```filter_RSEM_
 ```
 cut -f1 single_annotated_genes.txt | grep -v 'CONTIG' > sag_to_remove
 ```
-```
-./filter_RSEM_results.sh
-```
+The script ```filter_RSEM_results.py``` will accept any list of Trinity codes. Here, I use a list with single annotated genes.
 
+```
+for i in $(ls *.genes.results); do filter_RSEM_results.py $i sag_to_remove; done
+```
 
