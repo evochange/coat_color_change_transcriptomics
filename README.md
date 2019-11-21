@@ -1,5 +1,5 @@
 # Coat color change transcriptomics
-This is the pipeline and scripts used to analyze RNA-Sequencing data from skin samples of mountain hare (Lepus timidus) individuals undergoing autumn molt, by Mafalda Sousa Ferreira (mafalda_sferreira (at) hotmail.com). The dataset in this analysis comprises three skin samples representing three molt stages (early molt or "brown", middle molt or "intermediate" and late molt or "white") taken from four individuals (total of 12 skin samples). We had HiSeq 2500 and 2000 paired-end data for each skin sample.
+This is the pipeline and scripts used to analyze RNA-Sequencing data from skin samples of mountain hare (_Lepus timidus_) individuals undergoing autumn molt, by Mafalda Sousa Ferreira (mafalda_sferreira (at) hotmail.com). The dataset in this analysis comprises three skin samples representing three molt stages (early molt or "brown", middle molt or "intermediate" and late molt or "white") taken from four individuals (total of 12 skin samples). We had HiSeq 2500 and 2000 paired-end data for each skin sample.
 
 All python scripts use python 2.7.
 
