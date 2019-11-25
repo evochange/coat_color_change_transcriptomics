@@ -20,7 +20,7 @@ We run Trinity 2.6.6 to generate the assembly.
 ```
 
 #### Assessing assembly quality
-We used Transrate 1.0.3 to assess raw assembly quality and generate a "good" (filtered) assembly.
+We used Transrate 1.0.2 to assess raw assembly quality and generate a "good" (filtered) assembly.
 
 ```
 transrate --threads 8 --assembly ~/timidus/raw_transcriptome_APT/APT_transcriptome_trinity.Trinity.fasta --left ~/timidus/filtered_reads/timidus_R1.fq --right ~/timidus/filtered_reads/timidus_R2.fq --output ~/timidus/transrate_good_APT/
