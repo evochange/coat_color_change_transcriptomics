@@ -114,12 +114,12 @@ for f in $(ls *.sam); do ~/my_programs/RSEM-1.3.0/rsem-calculate-expression --ca
 Finally, filter multiple annotated genes from RSEM's output with ```filter_RSEM_results.sh``` and ```single_annotated_genes.txt```generated previously.
 
 ```
-cut -f1 single_annotated_genes.txt | grep -v 'CONTIG' > sag_to_remove
+cut -f1 single_annotated_genes.txt | grep -v 'CONTIG' > sag_to_keep
 ```
-The script ```filter_RSEM_results.py``` will accept any list of Trinity codes. Here, I use a list with single annotated genes.
+The script ```filter_RSEM_results.py``` will accept any list of Trinity codes that you want to keep and will exclude all contigs not contained in that list. Here, I use a list with single annotated genes.
 
 ```
-for i in $(ls *.genes.results); do filter_RSEM_results.py $i sag_to_remove; done
+for i in $(ls *.genes.results); do filter_RSEM_results.py $i sag_to_keep; done
 ```
 
 ## Gene Ontology analysis with a costume annotation in Ontologizer
